@@ -4,6 +4,7 @@ import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { images } from '../constants';
+import { StyleSheet } from 'react-native';
 
 export default function App() {
   return (
@@ -20,6 +21,9 @@ export default function App() {
             handlePress={() => router.push("/sign-in")}
             containerStyles="w-full mt-7"
             /> */}
+            <View style={StyleSheet.container}>
+              <Link href="/home" style={{ color: 'blue' }}>Home</Link>
+            </View>
           </View>
         </View>
       </ScrollView>
