@@ -21,7 +21,12 @@ const TabIcon = ({ icon, color, name, focused }) => {
 const TabsLayout = () => {
   return (
     <>
-        <Tabs>
+        <Tabs
+            screensOptions={{
+                tabBarStyle: {
+                    height: 100
+                }
+            }}>
             <Tabs.Screen 
                 name="home"
                 options={{ 
@@ -31,6 +36,30 @@ const TabsLayout = () => {
                             icon={icons.home}
                             color={color}
                             name="Home"
+                            focused={focused} /> ) 
+                }}
+            />
+            <Tabs.Screen 
+                name="camera"
+                options={{ 
+                    title: 'Camera',
+                    tabBarIcon: ({ color, focused }) => ( 
+                        <TabIcon 
+                            icon={icons.camera}
+                            color={color}
+                            name="Camera"
+                            focused={focused} /> ) 
+                }}
+            />
+            <Tabs.Screen 
+                name="results"
+                options={{ 
+                    title: 'Results',
+                    tabBarIcon: ({ color, focused }) => ( 
+                        <TabIcon 
+                            icon={icons.search}
+                            color={color}
+                            name="Results"
                             focused={focused} /> ) 
                 }}
             />
