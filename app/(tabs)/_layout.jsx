@@ -7,9 +7,12 @@ import iconSet from '@expo/vector-icons/build/Fontisto';
 const TabIcon = ({ icon, color, name, focused }) => {
     return (
         <View>
-            <Image 
+            <Image
+                style={{ flex: 1 }}
                 source={icon}
-            
+                resizeMode="contain"
+                tintColor={color}
+                className="w-6 h-6"
             />
         </View>
     )
