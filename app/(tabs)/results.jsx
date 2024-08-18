@@ -1,36 +1,66 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { WebView } from 'react-native-webview';
-import { View, Button, StyleSheet } from 'react-native';
+import { View, Button, StyleSheet, Text, ScrollView } from 'react-native';
 
 const RoboflowWebView = () => {
   const webViewRef = useRef(null);
+  const [diagnosis, setDiagnosis] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
 
   const runModel = () => {
     webViewRef.current.injectJavaScript(`
       const fileInput = document.getElementById('fileInput');
-      fileInput.click(); // Trigger the file input dialog
+      fileInput.click();
     `);
   };
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const base64 = reader.result.split(',')[1]; // Extract base64 data
-
-      webViewRef.current.injectJavaScript(`
-        const img = document.getElementById('imageElement');
-        img.onload = () => {
-          model.detect(img).then(function(predictions) {
-            window.ReactNativeWebView.postMessage(JSON.stringify(predictions));
-          });
-        };
-        img.src = "data:image/jpeg;base64,${base64}";
-      `);
+  const evaluateAcne = (predictions) => {
+    let severity = 'mild';
+    let count = {
+      'blackhead': 0,
+      'whitehead': 0,
+      'papule': 0,
+      'pustule': 0,
+      'nodule': 0,
+      'cyst': 0
     };
 
-    reader.readAsDataURL(file); // Convert file to base64
+    predictions.forEach(pred => {
+      count[pred.class] += 1;
+    });
+
+    if (count.nodule > 0 || count.cyst > 0) {
+      severity = 'severe';
+    } else if (count.papule > 5 || count.pustule > 5) {
+      severity = 'moderate';
+    }
+
+    return `${severity} acne`;
+  };
+
+  const getRecommendations = (severity) => {
+    const recommendations = [
+      "Cleanse your face twice daily with a gentle, non-comedogenic cleanser.",
+      "Use non-comedogenic and oil-free skincare products and makeup.",
+      "Avoid touching your face frequently and don't pop or squeeze pimples.",
+      "Stay hydrated and maintain a balanced diet."
+    ];
+
+    if (severity === 'moderate' || severity === 'severe') {
+      recommendations.push(
+        "Consider using over-the-counter treatments containing benzoyl peroxide or salicylic acid.",
+        "Consult a dermatologist for prescription treatments if OTC options aren't effective."
+      );
+    }
+
+    if (severity === 'severe') {
+      recommendations.push(
+        "A dermatologist may recommend prescription oral medications or other advanced treatments.",
+        "Be consistent with your treatment plan and follow up regularly with your dermatologist."
+      );
+    }
+
+    return recommendations;
   };
 
   return (
@@ -55,7 +85,7 @@ const RoboflowWebView = () => {
                         const file = event.target.files[0];
                         const reader = new FileReader();
                         reader.onload = () => {
-                          const base64 = reader.result.split(',')[1]; // Extract base64 data
+                          const base64 = reader.result.split(',')[1];
                           const img = document.getElementById('imageElement');
                           img.onload = () => {
                             model.detect(img).then(function(predictions) {
@@ -64,7 +94,7 @@ const RoboflowWebView = () => {
                           };
                           img.src = "data:image/jpeg;base64," + base64;
                         };
-                        reader.readAsDataURL(file); // Convert file to base64
+                        reader.readAsDataURL(file);
                       });
                     });
                 </script>
@@ -75,10 +105,24 @@ const RoboflowWebView = () => {
         onMessage={(event) => {
           const predictions = JSON.parse(event.nativeEvent.data);
           console.log("Predictions:", predictions);
+          const acneDiagnosis = evaluateAcne(predictions);
+          setDiagnosis(acneDiagnosis);
+          setRecommendations(getRecommendations(acneDiagnosis.split(' ')[0]));
         }}
         style={styles.webview}
       />
-      <Button title="Upload File" onPress={runModel} />
+      <Button title="Upload Photo" onPress={runModel} />
+      <ScrollView style={styles.resultsContainer}>
+        {diagnosis && (
+          <View>
+            <Text style={styles.diagnosisText}>Diagnosis: {diagnosis}</Text>
+            <Text style={styles.recommendationsTitle}>Recommendations:</Text>
+            {recommendations.map((rec, index) => (
+              <Text key={index} style={styles.recommendationItem}>• {rec}</Text>
+            ))}
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -89,6 +133,25 @@ const styles = StyleSheet.create({
   },
   webview: {
     flex: 1,
+  },
+  resultsContainer: {
+    flex: 1,
+    padding: 10,
+  },
+  diagnosisText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  recommendationsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  recommendationItem: {
+    fontSize: 14,
+    marginBottom: 5,
   },
 });
 
