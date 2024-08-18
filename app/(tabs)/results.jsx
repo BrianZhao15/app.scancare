@@ -17,7 +17,7 @@ const RoboflowWebView = () => {
     const reader = new FileReader();
 
     reader.onload = () => {
-      const base64 = reader.result.split(',')[1]; // Extract base64 data
+      const base64 = reader.result.split(',')[1];
 
       webViewRef.current.injectJavaScript(`
         const img = document.getElementById('imageElement');
@@ -30,7 +30,7 @@ const RoboflowWebView = () => {
       `);
     };
 
-    reader.readAsDataURL(file); // Convert file to base64
+    reader.readAsDataURL(file);
   };
 
   return (
