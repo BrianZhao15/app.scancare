@@ -1,92 +1,95 @@
-// // Results.jsx
-// import React, { useEffect, useState } from 'react';
-// import { View, Text, StyleSheet, ScrollView } from 'react-native';
-// import { usePredictions } from './PredictionsContext';
+import React, { useRef } from 'react';
+import { WebView } from 'react-native-webview';
+import { View, Button, StyleSheet } from 'react-native';
 
-// const Results = () => {
-//   const { predictions } = usePredictions();
-//   const [diagnosis, setDiagnosis] = useState('');
-//   const [recommendations, setRecommendations] = useState('');
+const RoboflowWebView = () => {
+  const webViewRef = useRef(null);
 
-//   useEffect(() => {
-//     if (predictions && predictions.length > 0) {
-//       const newDiagnosis = diagnoseAcne(predictions);
-//       setDiagnosis(newDiagnosis);
-//       setRecommendations(getRecommendations(newDiagnosis));
-//     }
-//   }, [predictions]);
+  const runModel = () => {
+    webViewRef.current.injectJavaScript(`
+      const fileInput = document.getElementById('fileInput');
+      fileInput.click(); // Trigger the file input dialog
+    `);
+  };
 
-//   const diagnoseAcne = (predictions) => {
-//     const acneTypes = {
-//       blackheads: 0,
-//       'dark spot': 0,
-//       nodules: 0,
-//       papules: 0,
-//       pustules: 0,
-//       whiteheads: 0,
-//     };
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
 
-//     predictions.forEach(pred => {
-//       if (acneTypes.hasOwnProperty(pred.class)) {
-//         acneTypes[pred.class]++;
-//       }
-//     });
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1]; // Extract base64 data
 
-//     if (acneTypes.nodules > 0 || acneTypes.pustules > 0) {
-//       return "Severe Acne";
-//     } else if (acneTypes.papules > 0 || acneTypes.whiteheads > 3 || acneTypes.blackheads > 3) {
-//       return "Moderate Acne";
-//     } else if (acneTypes.whiteheads > 0 || acneTypes.blackheads > 0 || acneTypes['dark spot'] > 0) {
-//       return "Mild Acne";
-//     } else {
-//       return "No significant acne detected";
-//     }
-//   };
+      webViewRef.current.injectJavaScript(`
+        const img = document.getElementById('imageElement');
+        img.onload = () => {
+          model.detect(img).then(function(predictions) {
+            window.ReactNativeWebView.postMessage(JSON.stringify(predictions));
+          });
+        };
+        img.src = "data:image/jpeg;base64,${base64}";
+      `);
+    };
 
-//   const getRecommendations = (diagnosis) => {
-//     switch (diagnosis) {
-//       case "Severe Acne":
-//         return "Consult a dermatologist. Use a gentle cleanser, benzoyl peroxide treatment, and non-comedogenic moisturizer.";
-//       case "Moderate Acne":
-//         return "Use salicylic acid cleanser, spot treatment with benzoyl peroxide, and oil-free moisturizer.";
-//       case "Mild Acne":
-//         return "Use a gentle cleanser with salicylic acid, apply tea tree oil as a spot treatment, and use a light, oil-free moisturizer.";
-//       default:
-//         return "Maintain a basic skincare routine with a gentle cleanser, moisturizer, and sunscreen.";
-//     }
-//   };
+    reader.readAsDataURL(file); // Convert file to base64
+  };
 
-//   if (!predictions || predictions.length === 0) {
-//     return (
-//       <View style={styles.container}>
-//         <Text style={styles.title}>No predictions available yet</Text>
-//         <Text>Take a photo to see results</Text>
-//       </View>
-//     );
-//   }
+  return (
+    <View style={styles.container}>
+      <WebView
+        ref={webViewRef}
+        originWhitelist={['*']}
+        source={{
+          html: `
+            <html>
+              <head>
+                <script src="https://cdn.roboflow.com/0.2.26/roboflow.js"></script>
+              </head>
+              <body>
+                <input type="file" id="fileInput" style="display:none;" />
+                <img id="imageElement" style="max-width: 100%; height: auto;" />
+                <script>
+                  roboflow.auth({ publishable_key: "rf_WtYiuyT2mBbUXQsQbLjhnZiW67f1" })
+                    .load({ model: "scancare", version: 1 })
+                    .then(function(model) {
+                      document.getElementById('fileInput').addEventListener('change', (event) => {
+                        const file = event.target.files[0];
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          const base64 = reader.result.split(',')[1]; // Extract base64 data
+                          const img = document.getElementById('imageElement');
+                          img.onload = () => {
+                            model.detect(img).then(function(predictions) {
+                              window.ReactNativeWebView.postMessage(JSON.stringify(predictions));
+                            });
+                          };
+                          img.src = "data:image/jpeg;base64," + base64;
+                        };
+                        reader.readAsDataURL(file); // Convert file to base64
+                      });
+                    });
+                </script>
+              </body>
+            </html>
+          `,
+        }}
+        onMessage={(event) => {
+          const predictions = JSON.parse(event.nativeEvent.data);
+          console.log("Predictions:", predictions);
+        }}
+        style={styles.webview}
+      />
+      <Button title="Upload File" onPress={runModel} />
+    </View>
+  );
+};
 
-//   return (
-//     <ScrollView style={styles.container}>
-//       <View style={styles.card}>
-//         <Text style={styles.title}>Acne Diagnosis</Text>
-//         <Text style={styles.diagnosis}>{diagnosis}</Text>
-//       </View>
-//       <View style={styles.card}>
-//         <Text style={styles.title}>Recommendations</Text>
-//         <Text style={styles.recommendations}>{recommendations}</Text>
-//       </View>
-//       <View style={styles.card}>
-//         <Text style={styles.title}>Detected Acne Types</Text>
-//         {predictions.map((pred, index) => (
-//           <Text key={index} style={styles.prediction}>
-//             {pred.class}: {(pred.confidence * 100).toFixed(2)}% confidence
-//           </Text>
-//         ))}
-//       </View>
-//     </ScrollView>
-//   );
-// };
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  webview: {
+    flex: 1,
+  },
+});
 
-
-
-// export default Results;
+export default RoboflowWebView;
