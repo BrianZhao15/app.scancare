@@ -1,22 +1,24 @@
-import { StatusBar } from 'expo-status-bar';
-import { Image, Text, View, Button, StyleSheet, TouchableOpacity } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { Image, Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { images } from '../constants';
-import { useState } from 'react';
+import React from 'react';
+import { StatusBar } from 'expo-status-bar';
 
 export default function App() {
   const router = useRouter();
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <StatusBar style="auto" />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.contentContainer}>
           <Image source={images.logo} style={styles.logo} />
           <View style={styles.textContainer}>
+            <Text style={styles.appNameText}>ScanCare</Text>
             <Text style={styles.sloganText}>
-              Slogan here
+              Your Personal Skin Care Assistant
             </Text>
           </View>
           <TouchableOpacity style={styles.homeButton} onPress={() => router.push('/home')}>
@@ -45,13 +47,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   logo: {
-    width: 400,
-    height: 400,
-    marginBottom: -20, // Move the logo up
+    width: 200,
+    height: 200,
+    marginBottom: 20,
   },
   textContainer: {
     marginTop: 20,
     alignItems: 'center',
+  },
+  appNameText: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#4A90E2',
+    marginBottom: 10,
   },
   sloganText: {
     fontSize: 24,
@@ -62,7 +70,7 @@ const styles = StyleSheet.create({
   homeButton: {
     position: 'absolute',
     bottom: 30,
-    backgroundColor: 'blue',
+    backgroundColor: '#4A90E2',
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 10,

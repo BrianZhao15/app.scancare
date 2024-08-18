@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Camera } from 'expo-camera';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { useRef } from 'react';
+import { cameraRef } from 'expo-camera';
 
 const CameraPage = () => {
   const [facing, setFacing] = useState('back');
   const [permission, requestPermission] = useCameraPermissions();
-  const cameraRef = useRef(null);
 
   if (permission === null) {
     return <View><Text>Requesting camera permission...</Text></View>;
@@ -34,7 +33,7 @@ const CameraPage = () => {
     if (cameraRef.current) {
       try {
         const photo = await cameraRef.current.takePictureAsync();
-        onPictureSaved(photo);
+        setPhoto(photo); // Store the photo object in state
       } catch (error) {
         console.error('Error taking picture:', error);
       }
@@ -49,7 +48,7 @@ const CameraPage = () => {
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing} ref={cameraRef}> 
+      <CameraView style={styles.camera} facing={facing}>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
             <Text style={styles.text}>Flip Camera</Text>

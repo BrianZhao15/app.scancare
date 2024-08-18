@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import Reminder from '../reminder.jsx';
 
-const Home = () => {
-  const [products, setProducts] = useState([]);
-  const [reminders, setReminders] = useState([]);
-
+const Home = ({ naviation }) => {
+    const [products, setProducts] = useState([]);
+    const [reminders, setReminders] = useState([]);
+    const [showReminder, setShowReminder] = useState(false);
+    
   useEffect(() => {
-    // Fetch product recommendations and reminders
+    // TODO: Fetch product recommendations and reminders
     fetchProducts();
     fetchReminders();
   }, []);
 
   const fetchProducts = () => {
-    // Simulating API call to fetch product recommendations
+    // TODO: API call to fetch product recommendations
     setProducts([
       { id: 1, name: 'Gentle Cleanser', image: 'https://example.com/cleanser.jpg' },
       { id: 2, name: 'Hydrating Moisturizer', image: 'https://example.com/moisturizer.jpg' },
@@ -22,16 +24,15 @@ const Home = () => {
   };
 
   const fetchReminders = () => {
-    // Simulating API call to fetch reminders
+    // TODO: API call to fetch reminders
     setReminders([
       { id: 1, time: '08:00 AM', task: 'Morning Routine' },
       { id: 2, time: '08:00 PM', task: 'Evening Routine' },
     ]);
   };
 
-  const addReminder = () => {
-    // Navigate to Add Reminder screen
-    console.log('Navigate to Add Reminder screen');
+  const navigateToAddReminder = () => {
+    navigation.navigate('AddReminder'); // Navigate to AddReminder screen
   };
 
   return (
@@ -61,7 +62,7 @@ const Home = () => {
             </View>
           </View>
         ))}
-        <TouchableOpacity style={styles.addButton} onPress={addReminder}>
+        <TouchableOpacity style={styles.addButton} onPress={Reminder}>
           <FontAwesome name="plus" size={20} color="#ffffff" />
           <Text style={styles.addButtonText}>Add Reminder</Text>
         </TouchableOpacity>
