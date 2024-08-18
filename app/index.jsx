@@ -1,31 +1,75 @@
 import { StatusBar } from 'expo-status-bar';
 import { Image, Text, View, Button, StyleSheet, TouchableOpacity } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScrollView } from 'react-native';
 import { images } from '../constants';
 import { useState } from 'react';
-import { CameraView, useCameraPermissions } from 'expo-camera';
 
 export default function App() {
+  const router = useRouter();
+
   return (
-    <SafeAreaView className="bg-white h-full">
-      <ScrollView contentContainerStyle={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <View className="w-full flex justify-center items-center h-full px-4">
-          <Image source={images.logo} style={{ width: 400, height: 400 }} />
-          <View className="relative mt-5">
-            <Text className="text-3xl text-black font-bold text-center">
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <View style={styles.contentContainer}>
+          <Image source={images.logo} style={styles.logo} />
+          <View style={styles.textContainer}>
+            <Text style={styles.sloganText}>
               Slogan here
             </Text>
-            <View style={StyleSheet.container}>
-              {/* Existing link to Home */}
-              <Link href="/home" style={{ color: 'blue', marginVertical: 10 }}>Home</Link>
-              {/* New link to Camera Page */}
-              <Link href="/camera" style={{ color: 'blue', marginVertical: 10 }}>Open Camera</Link>
-            </View>
           </View>
+          <TouchableOpacity style={styles.homeButton} onPress={() => router.push('/home')}>
+            <Text style={styles.homeButtonText}>Go to Home</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  logo: {
+    width: 400,
+    height: 400,
+    marginBottom: -20, // Move the logo up
+  },
+  textContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  sloganText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'black',
+    textAlign: 'center',
+  },
+  homeButton: {
+    position: 'absolute',
+    bottom: 30,
+    backgroundColor: 'blue',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+  },
+  homeButtonText: {
+    fontSize: 18,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+});
