@@ -1,151 +1,143 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
-import Reminder from '../reminder.jsx';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { Linking } from 'react-native';
 
-const Home = ({ naviation }) => {
-    const [products, setProducts] = useState([]);
-    const [reminders, setReminders] = useState([]);
-    const [showReminder, setShowReminder] = useState(false);
-    
-  useEffect(() => {
-    // TODO: Fetch product recommendations and reminders
-    fetchProducts();
-    fetchReminders();
-  }, []);
+const popularProducts = [
+  { 
+    id: 1, 
+    name: 'CeraVe Foaming Facial Cleanser', 
+    url: 'https://www.cerave.com/skincare/cleansers/foaming-facial-cleanser',
+    imageUrl: 'https://www.cerave.com/-/media/project/loreal/brand-sites/cerave/americas/us/products-v3/foaming-facial-cleanser/700x875/cerave_foaming_facial_cleanser_12oz_front-700x875-v2.jpg'
+  },
+  { 
+    id: 2, 
+    name: 'The Ordinary Niacinamide 10% + Zinc 1%', 
+    url: 'https://theordinary.com/product/niacinamide-10pct-zinc-1pct',
+    imageUrl: 'https://theordinary.com/dw/image/v2/BFKJ_PRD/on/demandware.static/-/Sites-deciem-master/default/dw0c91e33e/Images/products/The%20Ordinary/rdn-niacinamide-10pct-zinc-1pct-30ml.png'
+  },
+  { 
+    id: 3, 
+    name: 'Paula\'s Choice 2% BHA Liquid Exfoliant', 
+    url: 'https://www.paulaschoice.com/skin-perfecting-2pct-bha-liquid-exfoliant/201.html',
+    imageUrl: 'https://www.paulaschoice.com/dw/image/v2/BBNX_PRD/on/demandware.static/-/Sites-pc-catalog/default/dw8010b7d9/images/products/skin-perfecting-2-percent-bha-liquid-2010-L.png'
+  },
+  // Add more products as needed
+];
 
-  const fetchProducts = () => {
-    // TODO: API call to fetch product recommendations
-    setProducts([
-      { id: 1, name: 'Gentle Cleanser', image: 'https://example.com/cleanser.jpg' },
-      { id: 2, name: 'Hydrating Moisturizer', image: 'https://example.com/moisturizer.jpg' },
-      { id: 3, name: 'Vitamin C Serum', image: 'https://example.com/serum.jpg' },
-    ]);
-  };
+const acneTypes = [
+  { type: 'Hormonal Acne', products: ['Differin Gel', 'La Roche-Posay Effaclar Duo'] },
+  { type: 'Cystic Acne', products: ['Renee Rouleau Anti-Cyst Treatment', 'Mario Badescu Buffering Lotion'] },
+  { type: 'Whitehead and Blackhead', products: ['Paula\'s Choice 2% BHA Liquid Exfoliant', 'The Ordinary Salicylic Acid 2% Solution'] },
+];
 
-  const fetchReminders = () => {
-    // TODO: API call to fetch reminders
-    setReminders([
-      { id: 1, time: '08:00 AM', task: 'Morning Routine' },
-      { id: 2, time: '08:00 PM', task: 'Evening Routine' },
-    ]);
-  };
+const Home = () => {
+  const [selectedAcneType, setSelectedAcneType] = useState(null);
 
-  const navigateToAddReminder = () => {
-    navigation.navigate('AddReminder'); // Navigate to AddReminder screen
+  const handleProductPress = (url) => {
+    Linking.openURL(url);
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Your Skincare Routine</Text>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Recommended Products</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {products.map((product) => (
-            <TouchableOpacity key={product.id} style={styles.productCard}>
-              <Image source={{ uri: product.image }} style={styles.productImage} />
-              <Text style={styles.productName}>{product.name}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Reminders</Text>
-        {reminders.map((reminder) => (
-          <View key={reminder.id} style={styles.reminderItem}>
-            <FontAwesome name="clock-o" size={24} color="#4a4a4a" />
-            <View style={styles.reminderText}>
-              <Text style={styles.reminderTime}>{reminder.time}</Text>
-              <Text style={styles.reminderTask}>{reminder.task}</Text>
-            </View>
-          </View>
+    <View style={styles.container}>
+      <Text style={styles.title}>Popular Skincare Products</Text>
+      <ScrollView horizontal style={styles.productList}>
+        {popularProducts.map((product) => (
+          <TouchableOpacity
+            key={product.id}
+            style={styles.productItem}
+            onPress={() => handleProductPress(product.url)}
+          >
+            <Image source={{ uri: product.imageUrl }} style={styles.productImage} />
+            <Text style={styles.productName}>{product.name}</Text>
+          </TouchableOpacity>
         ))}
-        <TouchableOpacity style={styles.addButton} onPress={Reminder}>
-          <FontAwesome name="plus" size={20} color="#ffffff" />
-          <Text style={styles.addButtonText}>Add Reminder</Text>
+      </ScrollView>
+
+      <Text style={styles.subtitle}>Products for Specific Acne Types</Text>
+      {acneTypes.map((acneType) => (
+        <TouchableOpacity
+          key={acneType.type}
+          style={styles.acneTypeItem}
+          onPress={() => setSelectedAcneType(acneType)}
+        >
+          <Text style={styles.acneTypeName}>{acneType.type}</Text>
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+      ))}
+
+      {selectedAcneType && (
+        <View style={styles.acneTypeInfo}>
+          <Text style={styles.acneTypeTitle}>{selectedAcneType.type}</Text>
+          <Text style={styles.acneTypeProducts}>
+            Recommended Products:
+            {selectedAcneType.products.map((product) => (
+              <Text key={product}>{'\n'}- {product}</Text>
+            ))}
+          </Text>
+        </View>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     padding: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
   },
-  section: {
-    marginBottom: 30,
-  },
-  sectionTitle: {
-    fontSize: 18,
+  subtitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginTop: 20,
+    marginBottom: 10,
   },
-  productCard: {
-    width: 150,
-    marginRight: 15,
-    backgroundColor: '#ffffff',
-    borderRadius: 10,
+  productList: {
+    flexDirection: 'row',
+  },
+  productItem: {
+    backgroundColor: '#f0f0f0',
     padding: 10,
+    marginRight: 10,
+    borderRadius: 5,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    width: 150,
   },
   productImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 10,
+    width: 100,
+    height: 100,
     marginBottom: 10,
+    resizeMode: 'contain',
   },
   productName: {
-    textAlign: 'center',
     fontSize: 14,
+    textAlign: 'center',
   },
-  reminderItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 10,
+  acneTypeItem: {
+    backgroundColor: '#e0e0e0',
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  acneTypeName: {
+    fontSize: 18,
+  },
+  acneTypeInfo: {
+    marginTop: 20,
+    backgroundColor: '#f5f5f5',
     padding: 15,
+    borderRadius: 5,
+  },
+  acneTypeTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
     marginBottom: 10,
   },
-  reminderText: {
-    marginLeft: 15,
-  },
-  reminderTime: {
+  acneTypeProducts: {
     fontSize: 16,
-    fontWeight: 'bold',
-  },
-  reminderTask: {
-    fontSize: 14,
-    color: '#4a4a4a',
-  },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#4CAF50',
-    borderRadius: 10,
-    padding: 15,
-    marginTop: 10,
-  },
-  addButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: 10,
   },
 });
 
