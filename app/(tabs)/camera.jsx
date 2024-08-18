@@ -3,6 +3,7 @@ import { Camera } from 'expo-camera';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRef } from 'react';
+import * as MediaLibrary from 'expo-media-library';
 
 const CameraPage = () => {
   const [facing, setFacing] = useState('back');
@@ -41,11 +42,21 @@ const CameraPage = () => {
     }
   };
 
-  const onPictureSaved = (photo) => {
+  const onPictureSaved = async (photo) => {
     console.log('Photo saved:', photo);
-    // Handle the photo object (e.g., save to gallery, upload, etc.)
-  };
-  
+    const imageUri = photo.uri;
+
+    if (imageUri) {
+        try {
+            await MediaLibrary.saveToLibraryAsync(imageUri);
+            console.log('Photo successfully saved to gallery');
+        } catch (error) {
+            console.error('Error saving photo to gallery:', error);
+        }
+    } else {
+        console.error('No valid URI found in the photo object');
+    }
+};
 
   return (
     <View style={styles.container}>
