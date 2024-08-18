@@ -1,49 +1,92 @@
-import React from 'react';
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+// // Results.jsx
+// import React, { useEffect, useState } from 'react';
+// import { View, Text, StyleSheet, ScrollView } from 'react-native';
+// import { usePredictions } from './PredictionsContext';
 
-const ResultsPage = ({ route }) => {
-  // Destructure predictions from route.params with a fallback to an empty array
-  const { predictions = [] } = route?.params || {};
+// const Results = () => {
+//   const { predictions } = usePredictions();
+//   const [diagnosis, setDiagnosis] = useState('');
+//   const [recommendations, setRecommendations] = useState('');
 
-  // Function to generate diagnosis based on predictions
-  const generateDiagnosis = (predictions) => {
-    // Implement logic based on your specific model's predictions
-    // For example:
-    if (predictions.some(prediction => prediction.class === 'specificCondition')) {
-      return 'Diagnosis: Specific Condition Detected';
-    } else {
-      return 'Diagnosis: No Specific Condition Detected';
-    }
-  };
+//   useEffect(() => {
+//     if (predictions && predictions.length > 0) {
+//       const newDiagnosis = diagnoseAcne(predictions);
+//       setDiagnosis(newDiagnosis);
+//       setRecommendations(getRecommendations(newDiagnosis));
+//     }
+//   }, [predictions]);
 
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.resultContainer}>
-        <Text style={styles.title}>Predictions:</Text>
-        <Text>{JSON.stringify(predictions, null, 2)}</Text>
-      </View>
-      <View style={styles.resultContainer}>
-        <Text style={styles.title}>Diagnosis:</Text>
-        <Text>{generateDiagnosis(predictions)}</Text>
-      </View>
-    </ScrollView>
-  );
-};
+//   const diagnoseAcne = (predictions) => {
+//     const acneTypes = {
+//       blackheads: 0,
+//       'dark spot': 0,
+//       nodules: 0,
+//       papules: 0,
+//       pustules: 0,
+//       whiteheads: 0,
+//     };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
-  },
-  resultContainer: {
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-});
+//     predictions.forEach(pred => {
+//       if (acneTypes.hasOwnProperty(pred.class)) {
+//         acneTypes[pred.class]++;
+//       }
+//     });
 
-export default ResultsPage;
+//     if (acneTypes.nodules > 0 || acneTypes.pustules > 0) {
+//       return "Severe Acne";
+//     } else if (acneTypes.papules > 0 || acneTypes.whiteheads > 3 || acneTypes.blackheads > 3) {
+//       return "Moderate Acne";
+//     } else if (acneTypes.whiteheads > 0 || acneTypes.blackheads > 0 || acneTypes['dark spot'] > 0) {
+//       return "Mild Acne";
+//     } else {
+//       return "No significant acne detected";
+//     }
+//   };
+
+//   const getRecommendations = (diagnosis) => {
+//     switch (diagnosis) {
+//       case "Severe Acne":
+//         return "Consult a dermatologist. Use a gentle cleanser, benzoyl peroxide treatment, and non-comedogenic moisturizer.";
+//       case "Moderate Acne":
+//         return "Use salicylic acid cleanser, spot treatment with benzoyl peroxide, and oil-free moisturizer.";
+//       case "Mild Acne":
+//         return "Use a gentle cleanser with salicylic acid, apply tea tree oil as a spot treatment, and use a light, oil-free moisturizer.";
+//       default:
+//         return "Maintain a basic skincare routine with a gentle cleanser, moisturizer, and sunscreen.";
+//     }
+//   };
+
+//   if (!predictions || predictions.length === 0) {
+//     return (
+//       <View style={styles.container}>
+//         <Text style={styles.title}>No predictions available yet</Text>
+//         <Text>Take a photo to see results</Text>
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <ScrollView style={styles.container}>
+//       <View style={styles.card}>
+//         <Text style={styles.title}>Acne Diagnosis</Text>
+//         <Text style={styles.diagnosis}>{diagnosis}</Text>
+//       </View>
+//       <View style={styles.card}>
+//         <Text style={styles.title}>Recommendations</Text>
+//         <Text style={styles.recommendations}>{recommendations}</Text>
+//       </View>
+//       <View style={styles.card}>
+//         <Text style={styles.title}>Detected Acne Types</Text>
+//         {predictions.map((pred, index) => (
+//           <Text key={index} style={styles.prediction}>
+//             {pred.class}: {(pred.confidence * 100).toFixed(2)}% confidence
+//           </Text>
+//         ))}
+//       </View>
+//     </ScrollView>
+//   );
+// };
+
+
+
+// export default Results;
