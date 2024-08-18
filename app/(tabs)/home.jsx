@@ -21,7 +21,6 @@ const popularProducts = [
     url: 'https://www.paulaschoice.com/skin-perfecting-2pct-bha-liquid-exfoliant/201.html',
     imageUrl: 'https://www.paulaschoice.com/dw/image/v2/BBNX_PRD/on/demandware.static/-/Sites-pc-catalog/default/dw8010b7d9/images/products/skin-perfecting-2-percent-bha-liquid-2010-L.png'
   },
-  // Add more products as needed
 ];
 
 const acneTypes = [
